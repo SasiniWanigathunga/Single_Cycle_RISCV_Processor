@@ -1,0 +1,37 @@
+module ALU #(
+	parameter DATA_WIDTH = 32;
+	parameter ALUSel_LENGTH = 4;
+	)(
+	input logic [DATA_WIDTH-1:0] BUS_A;
+	input logic [DATA_WIDTH-1:0] BUS_B;
+	input logic [ALUSel_LENGTH-1:0] ALU_OPERATION;
+	
+	output logic [DATA_WIDTH-1:0] ALU_RESULT;
+	);
+	
+	// ALU operation control signals
+	parameter ADD = 4'b0000;
+	parameter SUB = 4'b0001;
+	parameter SLL = 4'b0010;
+	parameter SLT = 4'b0011;
+	parameter SLTU = 4'b0100;
+	parameter XOR = 4'b0101;
+	parameter SRL = 4'b0110;
+	parameter SRA = 4'b0111;
+	parameter OR =  4'b1000;
+	parameter AND = 4'b1001;
+	
+	always_comb begin
+    case(ALU_OPERATION)
+        ADD: ALU_RESULT = op_A + op_B;
+        SUB: ALU_RESULT = op_A - op_B;
+        AND: ALU_RESULT = op_A & op_B;
+        OR:  ALU_RESULT = op_A | op_B;
+        XOR: ALU_RESULT = op_A ^ op_B;
+        SLL: ALU_RESULT = op_A << op_B[4:0];
+        SRL: ALU_RESULT = op_A >> op_B[4:0];
+        SRA: ALU_RESULT = $signed(op_A) >>> op_B[4:0]; // Arithmetic right shift with sign extension
+        default: ALU_RESULT = 32'b0;  // Default to zero if an unsupported operation is specified
+    endcase
+end
+	

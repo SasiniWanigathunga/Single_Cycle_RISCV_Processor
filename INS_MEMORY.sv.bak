@@ -1,0 +1,14 @@
+module INS_MEMORY #(
+		parameter INS_WIDTH = 5,
+		parameter INS_ADD_WIDTH = 7
+	)(
+		input logic [DATA_WIDTH-1:0] PC,
+		output logic [DATA_WIDTH:0] INS
+	);
+
+	logic [3:0][7:0] memory [NUM_INST-1:0];
+	
+	// Since PC is byte addressed, we must ignore last 2 bits when indexing
+	assign instruction = memory[pc >> 2];
+	
+endmodule
