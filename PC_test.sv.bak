@@ -1,0 +1,36 @@
+`timescale 1ns / 1ps
+
+module PC_test;
+
+    // Inputs
+    reg CLK;
+    reg RST;
+
+    // Outputs
+    wire [31:0] PC;
+    wire [31:0] PC_OUT;
+
+    // Instantiate the Unit Under Test (UUT)
+    PC uut (
+        .CLK(CLK), 
+        .RST(RST), 
+        .PC(PC), 
+        .PC_OUT(PC_OUT)
+    );
+
+    initial begin
+        // Initialize Inputs
+        CLK = 0;
+        RST = 0;
+
+        // Wait 100 ns for global reset to finish
+        #100;
+        
+        // Deassert reset
+        RST = 1;
+        
+        // Clock can be driven with a loop
+        forever #10 CLK = ~CLK;
+    end
+      
+endmodule

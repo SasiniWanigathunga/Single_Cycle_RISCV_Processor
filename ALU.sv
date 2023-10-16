@@ -1,11 +1,8 @@
-module ALU #(
-		 parameter DATA_WIDTH = 32,
-		 parameter ALUSel_WIDTH = 4
-	)(
-		 input logic [DATA_WIDTH-1:0] BUS_A,  //register rs1
-		 input logic [DATA_WIDTH-1:0] BUS_B,  //register rs2
-		 input logic [ALUSel_WIDTH-1:0] ALUSel,   //ALUSel control signal
-		 output logic [DATA_WIDTH-1:0] ALU_OUT,   //ALU output
+module ALU (
+		 input logic [31:0] BUS_A,  //register rs1
+		 input logic [31:0] BUS_B,  //register rs2
+		 input logic [3:0] ALUSel,   //ALUSel control signal
+		 output logic [31:0] ALU_OUT,   //ALU output
 		 output logic ZERO_FLAG, NEG_FLAG   //zero and negative flags
 	);
 	
@@ -45,12 +42,12 @@ module ALU #(
 			AND: 
 				ALU_OUT = BUS_A & BUS_B;
 		
-			default: ALU_OUT = {DATA_WIDTH{1'b0}};  // Default to zero if an unsupported operation is specified
+			default: ALU_OUT = {32{1'b0}};  // Default to zero if an unsupported operation is specified
 		endcase
 		
 				
-		assign ZERO_FLAG = (ALU_OUT == 0) ? 1'b1 : 1'b0;
-		assign NEG_FLAG = (ALU_OUT < 0) ? 1'b1 : 1'b0;
+		ZERO_FLAG = (ALU_OUT == 0) ? 1'b1 : 1'b0;
+		NEG_FLAG = (ALU_OUT < 0) ? 1'b1 : 1'b0;
 		
 	end
 endmodule

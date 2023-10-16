@@ -1,0 +1,67 @@
+/**
+module PC (
+		 input logic CLK, RST,
+		 //input logic [31:0] PC_Increment,	//branch instructions
+		 //input logic [31:0] target_pc,	// JALR
+		 input logic ZERO_FLAG, NEG_FLAG,
+		 //input logic [31:0] PC_IN,
+		 output logic [31:0] PC_OUT
+	);
+	
+	
+	always @(posedge CLK or negedge RST) begin
+		if(!RST)
+			 PC_OUT <= 32'b0;
+		else if (CLK)
+			 PC_OUT <= PC_IN + 4;
+	end
+
+endmodule
+**/
+
+/**
+module PC #(parameter PC_W = 9) (
+    input logic CLK, RST,
+	 //input logic [PC_W - 1:0] PC_IN,
+    output logic [PC_W - 1:0] PC_OUT
+);
+	 logic [PC_W - 1:0] PC_IN;
+    logic [PC_W - 1:0] PC_NEXT;
+
+    always_ff @(posedge CLK or posedge RST) begin
+        if (RST)
+            PC_NEXT <= '0;
+        else
+            PC_NEXT <= PC_OUT + 4;
+    end
+
+    assign PC_OUT = PC_NEXT;
+
+endmodule
+**/
+
+
+module PC_ (
+	input logic CLK, RST,
+	
+	output logic [31:0] PC		// PC register
+	//output logic [31:0] PC_OUT
+);
+
+	logic [31:0] next_pc;
+	
+	always @(posedge CLK or posedge RST) begin
+		if (RST) 
+			PC <= 32'b0;
+		else 
+			PC <= next_pc;
+	end
+	
+	// Next PC logic
+	always_comb begin
+		next_pc = PC + 4;
+	end
+						 
+	//assign PC_OUT = PC + 4;
+
+endmodule
