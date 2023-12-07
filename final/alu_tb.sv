@@ -1,0 +1,59 @@
+`timescale 1ns/1ps
+
+module alu_tb();
+	
+	logic [3:0] ALUSel;
+	logic signed [31:0] BUS_A, BUS_B, ALU_OUT;
+	logic ZERO_FLAG, NEG_FLAG;
+	
+	//ALU dut(.*);
+	ALU ALU_module(
+		.BUS_A(BUS_A),
+		.BUS_B(BUS_B), 
+		.ALUSel(ALUSel), 
+		.ALU_OUT(ALU_OUT), 
+		.ZERO_FLAG(ZERO_FLAG), 
+		.NEG_FLAG(NEG_FLAG)
+	);
+	
+	parameter ADD = 4'b0000;
+	parameter SUB = 4'b0001;
+	parameter SLL = 4'b0010;
+	parameter SLT = 4'b0011;
+	parameter SLTU = 4'b0100;
+	parameter XOR = 4'b0101;
+	parameter SRL = 4'b0110;
+	parameter SRA = 4'b0111;
+	parameter OR =  4'b1000;
+	parameter AND = 4'b1001;
+	
+	initial begin
+		repeat(10) begin
+			//BUS_A <= $urandom;
+			//BUS_B <= $urandom;
+			//ALUSel = 4'b0000;
+			BUS_A = 32'b100;  // Manually set values for BUS_A and BUS_B
+			BUS_B = 32'b10;
+			
+			for (int i = 7; i < 10; i++) begin
+				ALUSel <= i;
+				
+				#10
+				case (ALUSel) 
+					ADD: assert (ALU_OUT == BUS_A + BUS_B) else $error("ADD: %d %d %d", ALU_OUT, BUS_A, BUS_B); 
+					SUB: assert (ALU_OUT == BUS_A - BUS_B) else $error("SUB: %d %d %d", ALU_OUT, BUS_A, BUS_B);
+					SLL: assert (ALU_OUT == (BUS_A << BUS_B)) else $error("SLL: %d %d %d", ALU_OUT, BUS_A, BUS_B);
+					SRL: assert (ALU_OUT == (BUS_A >> BUS_B)) else $error("SRL: %d %d %d", ALU_OUT, BUS_A, BUS_B);
+					SRA: assert (ALU_OUT == (BUS_A >>> BUS_B)) else $error("SRA: %d %d %d", ALU_OUT, BUS_A, BUS_B);
+					AND: assert (ALU_OUT == (BUS_A & BUS_B)) else $error("AND: %d %d %d", ALU_OUT, BUS_A&BUS_B, BUS_B);
+					OR: assert (ALU_OUT == (BUS_A | BUS_B)) else $error("OR: %d %d %d", ALU_OUT, BUS_A, BUS_B);
+					XOR: assert (ALU_OUT == (BUS_A ^ BUS_B)) else $error("XOR: %d %d %d", ALU_OUT, BUS_A, BUS_B);
+					SLT: assert (ALU_OUT == (BUS_A < BUS_B)) else $error("SLT: %d %d %d", ALU_OUT, BUS_A, BUS_B);
+					SLTU: assert (ALU_OUT == $unsigned(BUS_A) < $unsigned(BUS_B)) else $error("SLTU: %d %d %d", ALU_OUT, BUS_A, BUS_B);
+				endcase
+			end
+		end
+	end
+	
+	
+endmodule

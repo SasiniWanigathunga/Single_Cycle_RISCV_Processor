@@ -1,0 +1,103 @@
+/**
+module BRANCH_COMP (
+		input logic CLK, RST,
+		input logic [31:0] DATA_A, DATA_B,
+		input logic BrUn,
+		
+		output logic [2:0] Branch
+		
+		/**
+		input logic [31:0] pc_offset,		// For branch and JAL
+		input logic [31:0] target_pc,	// For JALR, already calculated PC
+		
+		input logic [2:0] branch_type,
+		input logic alu_zero, alu_neg,
+		
+		output logic [31:0] pc,		// PC register
+		output logic [31:0] return_pc
+		**/
+	);
+	
+	logic BrEq, BrLT, BrGT;
+	
+	assign BrEq = (DATA_A == DATA_B);
+	assign BrLT = (DATA_A < DATA_B);
+	assign BrGT = (DATA_A > DATA_B);
+	
+	assign Branch = {BrEq, BrLT, BrGT};
+	
+	/**
+	logic [31:0] next_pc;
+	logic branch;
+	
+	always @(posedge clk or negedge rstn) begin
+		if (!rstn) pc <= 32'b0;
+		else pc <= next_pc;
+	end
+	
+	// Next PC logic
+	always_comb begin
+		if (!branch_type || !branch) // no branching
+			next_pc = pc + 4;
+		else if (branch_type == `JMP_JALR) 
+			next_pc = {target_pc[31:1], 1'b0};	// zero LSB
+		else
+			next_pc = pc + pc_offset;
+	end
+	
+	// Branch logic
+	assign branch = (branch_type == `JMP_JAL) ||
+						 (branch_type == `JMP_JALR) || 
+						 (branch_type == `JMP_BEQ && alu_zero) ||
+						 (branch_type == `JMP_BNE && (!alu_zero)) ||
+						 (branch_type == `JMP_BLT && (!alu_zero)) ||
+						 (branch_type == `JMP_BGT && alu_zero); 	// using slt/sltu
+						 
+	assign return_pc = pc + 4;
+	**/
+
+endmodule
+**/
+
+module BRANCH_COMP (
+    input wire [31:0] A, // Input A
+    input wire [31:0] B, // Input B
+    input wire BrUn, // Unsigned comparison (0 for signed, 1 for unsigned)
+    input wire [2:0] Funct3, // Function code for the branch instruction
+    output wire BrEq, // Branch if equal (BEQ)
+    output wire BrLT, // Branch if less than (BLT)
+    output wire BGE // Branch if greater or equal (BGE)
+);
+
+always @* begin
+    case (Funct3)
+        3'b000: begin // BEQ
+            BrEq = (A == B);
+            BrLT = 1'b0; // Not used for BEQ
+            BGE = 1'b0; // Not used for BEQ
+        end
+        3'b100: begin // BLT
+            if (BrUn)
+                BrLT = (A < B);
+            else
+                BrLT = ($signed(A) < $signed(B));
+            BrEq = 1'b0; // Not used for BLT
+            BGE = ~BrLT;
+        end
+        3'b101: begin // BGE
+            if (BrUn)
+                BGE = ~(A < B);
+            else
+                BGE = ~($signed(A) < $signed(B));
+            BrEq = 1'b0; // Not used for BGE
+            BrLT = ~BGE;
+        end
+        default: begin
+            BrEq = 1'b0;
+            BrLT = 1'b0;
+            BGE = 1'b0;
+        end
+    endcase
+end
+
+endmodule
